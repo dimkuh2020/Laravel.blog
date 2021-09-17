@@ -21,6 +21,8 @@ Route::get('/', function () {
 Route::group(['prefix' => 'admin', 'namespace' => 'Admin'], function(){ // группа роутов (или каждый по совему Route:get('/admin', 'Admin\MainController@index')->name('admin.index'); )
     Route::get('/', 'MainController@index')->name('admin.index');
     Route::resource('/categories', 'CategoryController');
+    Route::resource('/tags', 'TagController');
+    Route::resource('/posts', 'PostController');
 });
 
 
