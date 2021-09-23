@@ -41,11 +41,11 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="description">Цитата</label>
-                                    <textarea class="form-control" name="description" id="description" rows="3" placeholder="Цитата..."></textarea>
+                                    <textarea class="form-control @error('description') is-invalid @enderror" name="description" id="description" rows="3" placeholder="Цитата..."></textarea>
                                 </div>
                                 <div class="form-group">
                                     <label for="content">Контент</label>
-                                    <textarea class="form-control" name="content" id="content" rows="7" placeholder="Контент..."></textarea>
+                                    <textarea class="form-control @error('content') is-invalid @enderror"" name="content" id="content" rows="7" placeholder="Контент..."></textarea>
                                 </div>
                                 <div class="form-group">
                                     <label for="category_id">Категория</label>

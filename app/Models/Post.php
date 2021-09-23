@@ -11,6 +11,8 @@ class Post extends Model
     use HasFactory;
     use Sluggable;
 
+    protected $fillable = ['title', 'description', 'content', 'category_id', 'thumbnail'];
+
     public function tags(){ //имеет много постов и много тегов
         return $this->belongsToMany(Tag::class);
     }
@@ -33,4 +35,5 @@ class Post extends Model
             ]
         ];
     }
+
 }

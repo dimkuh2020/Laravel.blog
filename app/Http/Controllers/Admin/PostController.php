@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Post;
@@ -43,8 +44,21 @@ class PostController extends Controller
     {
         $request->validate([
             'title' => 'required',
-
+            'description' => 'required',
+            'content' => 'required',
+            'category_id' => 'required|integer',
+            'thumbnail' => 'nullable|image', // картинка
         ]);
+
+        $data = $request->all();
+
+        if($request->hasFile('thumbnail')) { // если есть картинка
+            $folder = date('Y-m-d');
+            $data['thumbnail'] = $request->file('thumbnail')->store("images/{$folder}", 'public'); //папки storage/app/images/сегодн. дата/файлик
+        }
+
+        $post = Post::create($data); // получаем посты
+        $post->tags()->sync($request->tags); // синхонизирует теги из запроса create.blade.php name="tags[]"
 
         return redirect()->route('posts.index')->with('success', 'Статья добавлена');
     }
@@ -68,7 +82,11 @@ class PostController extends Controller
      */
     public function edit($id)
     {
-      return view('admin.posts.edit');
+       $post = Post::find($id);
+                                    //значение //ключ
+      $categories = Category::pluck('title', 'id')->all(); //получить только title
+      $tags = Tag::pluck('title', 'id')->all(); //получить только title
+      return view('admin.posts.edit', compact('categories','tags', 'post'));
     }
 
     /**
@@ -81,8 +99,26 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'title' => 'required'
+            'title' => 'required',
+            'description' => 'required',
+            'content' => 'required',
+            'category_id' => 'required|integer',
+            'thumbnail' => 'nullable|image', // картинка
         ]);
+
+        $post = Post::find($id);
+        $data = $request->all();
+
+        //если пришло новое изображение, удаляем старое
+        if($request->hasFile('thumbnail')) { // если есть картинка
+
+            Storage::disk('public')->delete($post->thumbnail); // удаление из storage (диск public filesystems.php)
+            $folder = date('Y-m-d');
+            $data['thumbnail'] = $request->file('thumbnail')->store("images/{$folder}", 'public' ); //папки storage/app/images/сегодн. дата/файлик
+        }
+
+        $post->update($data);
+        $post->tags()->sync($request->tags); // синхонизирует теги из зап
 
         return redirect()->route('posts.index')->with('success', 'Статья изменена');
     }
@@ -95,8 +131,10 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        //$category = Category::find($id);
-        //$category->delete();
+        $post = Post::find($id);
+        $post->tags()->sync([]);  // удал синхронизтрованные теги
+        Storage::disk('public')->delete($post->thumbnail); // удал изображение
+        $post->delete();
         return redirect()->route('posts.index')->with('success', 'Статья удалена');
     }
 }
