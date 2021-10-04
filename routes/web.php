@@ -14,9 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', 'PostController@index')->name('home'); // все посты
+Route::get('/article', 'PostController@show')->name('posts.single'); //1 пост по ИД
 
 Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'admin'], function(){ // группа роутов + middleware (или каждый по совему Route:get('/admin', 'Admin\MainController@index')->name('admin.index'); )
     Route::get('/', 'MainController@index')->name('admin.index');
@@ -32,8 +31,6 @@ Route::group(['middleware' => 'guest'], function(){ // по middleware захо�
     Route::post('/login', 'UserController@login')->name('login');
 });
 
-
 Route::get('/logout', 'UserController@logout')->name('logout')->middleware('auth'); // отдельный middleware для зарегестрированых пользователей
-
 
 
